@@ -56,16 +56,60 @@ line_image = np.copy(image)*0 # creating a blank to draw lines on
 # Output "lines" is an array containing endpoints of detected line segments
 lines = cv2.HoughLinesP(masked_edges, rho, theta, threshold, np.array([]),
                             min_line_length, max_line_gap)
+#print(lines.shape)
+
+#print(lines[5])
 
 # Iterate over the output "lines" and draw lines on a blank image
+#for line in lines:
+#    for x1,y1,x2,y2 in line:
+#        cv2.line(line_image,(x1,y1),(x2,y2),(255,0,0),10) #draw lines over Hough transformed image
+
+#leftPoints = np.zeros(shape = (lines.shape[0],2) )
+#rightPoints = np.zeros(shape = (lines.shape[0],2) )
+leftPoints  =[[],[]]
+rightPoints =[[],[]]
+
 for line in lines:
     for x1,y1,x2,y2 in line:
-        cv2.line(line_image,(x1,y1),(x2,y2),(255,0,0),10) #draw lines over Hough transformed image
+        #if m< 0, left line
+        if ((y1-y2)/(x1-x2))<0:
+            leftPoints=np.append(leftPoints,[[x1,x2],[y1,y2]],axis=1)
+        else:
+           rightPoints=np.append(rightPoints,[[x1,x2],[y1,y2]],axis=1)
+           
+print(lines)  
+print(leftPoints)              
+print(leftPoints[0,:])
+print(rightPoints)
+
+leftLine=np.polyfit(leftPoints[1,:],leftPoints[0,:],1)  #x=f(y)
+rightLine=np.polyfit(rightPoints[1,:],rightPoints[0,:],1)  #x=f(y)
+
+# Left line initial and end points
+y1_left = imshape[0]
+x1_left = int(y1_left*leftLine[0]+leftLine[1])
+
+y2_left = 300
+x2_left = int(y2_left*leftLine[0]+leftLine[1])
+
+cv2.line(line_image,(x1_left,y1_left),(x2_left,y2_left),(255,0,0),10)
+
+# Right line initial and end points
+y1_right = imshape[0]
+x1_right = int(y1_right*rightLine[0]+rightLine[1])
+
+y2_right = 300
+x2_right = int(y2_right*rightLine[0]+rightLine[1])
+
+cv2.line(line_image,(x1_right,y1_right),(x2_right,y2_right),(255,0,0),10)
+        
+        #cv2.line(line_image,(x1,y1),(x2,y2),(255,0,0),10) #draw lines over Hough transformed image
 
 # Create a "color" binary image to combine with line image
-color_edges = np.dstack((edges, edges, edges)) 
-
-# Draw the lines on the edge image
+#color_edges = np.dstack((edges, edges, edges)) 
+#
+## Draw the lines on the edge image
 lines_edges = cv2.addWeighted(color_edges, 0.8, line_image, 1, 0) 
 plt.figure()
 plt.imshow(lines_edges)

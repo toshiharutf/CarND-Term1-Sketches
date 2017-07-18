@@ -61,9 +61,15 @@ lines = cv2.HoughLinesP(masked_edges, rho, theta, threshold, np.array([]),
 #print(lines[5])
 
 # Iterate over the output "lines" and draw lines on a blank image
-#for line in lines:
-#    for x1,y1,x2,y2 in line:
-#        cv2.line(line_image,(x1,y1),(x2,y2),(255,0,0),10) #draw lines over Hough transformed image
+for line in lines:
+    for x1,y1,x2,y2 in line:
+        cv2.line(line_image,(x1,y1),(x2,y2),(255,0,0),10) #draw lines over Hough transformed image
+
+color_edges = np.dstack((edges, edges, edges)) 
+comb_img = cv2.addWeighted(color_edges, 0.8, line_image, 1, 0) 
+
+plt.figure()
+plt.imshow(comb_img)
 
 #leftPoints = np.zeros(shape = (lines.shape[0],2) )
 #rightPoints = np.zeros(shape = (lines.shape[0],2) )
@@ -93,7 +99,7 @@ x1_left = int(y1_left*leftLine[0]+leftLine[1])
 y2_left = 300
 x2_left = int(y2_left*leftLine[0]+leftLine[1])
 
-cv2.line(line_image,(x1_left,y1_left),(x2_left,y2_left),(255,0,0),10)
+cv2.line(line_image,(x1_left,y1_left),(x2_left,y2_left),(255,0,0),20)
 
 # Right line initial and end points
 y1_right = imshape[0]
@@ -102,15 +108,15 @@ x1_right = int(y1_right*rightLine[0]+rightLine[1])
 y2_right = 300
 x2_right = int(y2_right*rightLine[0]+rightLine[1])
 
-cv2.line(line_image,(x1_right,y1_right),(x2_right,y2_right),(255,0,0),10)
+cv2.line(line_image,(x1_right,y1_right),(x2_right,y2_right),(255,0,0),20)
         
-        #cv2.line(line_image,(x1,y1),(x2,y2),(255,0,0),10) #draw lines over Hough transformed image
+        
 
 # Create a "color" binary image to combine with line image
 #color_edges = np.dstack((edges, edges, edges)) 
 #
 ## Draw the lines on the edge image
-lines_edges = cv2.addWeighted(color_edges, 0.8, line_image, 1, 0) 
+lines_edges = cv2.addWeighted(image, 0.8, line_image, 1, 0) 
 plt.figure()
 plt.imshow(lines_edges)
 
